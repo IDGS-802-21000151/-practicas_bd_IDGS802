@@ -1,0 +1,32 @@
+{% extends "layout2.html" %}
+
+{% block content %}
+{% import "_macros.html" as macros %}
+
+<h1>Alumnos</h1>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+        {% for message in messages %}
+          <li>
+            {{ message }}
+          </li>
+        {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<form action="/alumnos" method="POST" novalidate>
+  <h1 class="display-1">Registrate en BD</h1>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {{ macros.input_Form(form.nombre, class="form-control") }}
+  {{ macros.input_Form(form.primerApellido, class="form-control") }}
+  {{ macros.input_Form(form.segundoApellido, class="form-control") }}
+  {{ macros.input_Form(form.edad, class="form-control") }}
+  {{ macros.input_Form(form.correo, class="form-control") }}
+
+  <button type="submit" class="btn btn-success">Mandar datos</button>
+</form>
+
+{% endblock %}

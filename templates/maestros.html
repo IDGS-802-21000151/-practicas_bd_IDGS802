@@ -1,0 +1,39 @@
+{% extends "layout2.html" %}
+{% from "_macros.html" import form_floating %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h3>Maestros</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Primer apellido</th>
+                    <th>Email</th>
+                    <th>Materia</th>
+                    <th>Telefono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for maestro in maestros %}
+                <tr>
+                    <td>{{ maestro.nombre }}</td>
+                    <td>{{ maestro.primerApellido }}</td>
+                    <td>{{ maestro.email }}</td>
+                    <td>{{ maestro.materia }}</td>
+                    <td>{{ maestro.telefono }}</td>
+                    <td class="row">
+                        <a href="{{ url_for('editarAlumno', idAlumno = maestro.id) }}" class="btn btn-warning col">Editar</a>
+                        <a href="{{ url_for('cargarIndex') }}" class="btn btn-danger mx-3 col">Eliminar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

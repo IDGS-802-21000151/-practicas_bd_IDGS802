@@ -1,0 +1,57 @@
+{% macro datos(name, placeholder, type="text") %}
+<p><input name="{{name}}" placeholder="{{placeholder}}" type="{{type}}"></p>
+{% endmacro %}
+
+{% macro input_Form(field) %}
+<label class="form-label">{{ field.label }}</label>
+
+{{ field(class = "form-control")|safe }}
+
+{% if field.errors %}
+<ul>
+    {% for error in field.errors %}
+    <li style="color: red;">
+        {{ error }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}
+
+{% macro form_floating(field, type = "text", value = "") %}
+<div class="form-floating mb-3">
+    {{ field(class = "form-control", type=type, value=value)|safe }}
+    {{ field.label }}
+</div>
+
+{% if field.errors %}
+<ul>
+    {% for error in field.errors %}
+    <li style="color: red;">
+        {{ error }}
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endmacro %}
+
+{% macro radio(field) %}
+<div class="form-group mt-3">
+    {{ field.label }}
+
+    <div class="row mt-2">
+        {% for value, label in field.choices %}
+        <div class="col-6">
+            <div class="form-check d-flex align-items-center justify-content-center">
+                <input class="form-check-input mx-1" type="radio" name="{{ field.name }}"
+                    id="{{ field.name ~ '_' ~ value }}" value="{{ value }}" {% if value==field.data %}checked{% endif
+                    %}>
+                <label class="form-check-label" for="{{ field.name ~ '_' ~ value }}">
+                    {{ label }}
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}

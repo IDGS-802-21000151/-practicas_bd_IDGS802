@@ -1,0 +1,20 @@
+{% extends 'layout2.html' %}
+{% from "_macros.html" import form_floating %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <form action="/" name="registro" id="registro" method="POST" class="col">
+            <h1 class="display-4">Editar alumno</h1>
+
+            {{ form_floating(formRegistro.nombre, "text",alumno.nombre) }}
+            {{ form_floating(formRegistro.primerApellido, "text",alumno.primerApellido) }}
+            {{ form_floating(formRegistro.email, "email", alumno.email) }}
+
+            <button type="submit" class="btn btn-success w-100">Registrar</button>
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+    </div>
+</div>
+{% endblock %}
