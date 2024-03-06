@@ -1,5 +1,5 @@
 from wtforms import Form
-from wtforms import StringField, TextAreaField, SelectField, RadioField, IntegerField, TelField
+from wtforms import StringField, TextAreaField, SelectField, RadioField, IntegerField, TelField, BooleanField
 from wtforms import EmailField
 from wtforms import validators
 
@@ -31,5 +31,25 @@ class MeastroForm(Form):
         validators.length(min=4, max=10, message="Ingresa un nombre valido")
     ])
     telefono = TelField("Ingresa tu telefono", {
+        validators.DataRequired(message="El campo télefono es requerido")
+    })
+    
+class PizzasForm(Form):
+    nombreCliente = StringField("Ingresa el nombre del cliente", [
+        validators.DataRequired(message="El campo nombre es requerido")
+    ])
+    direccionCliente = StringField("Ingresa la dirección", [
+        validators.DataRequired(message="El campo dirección es requerido")
+    ])
+    telefonoCliente = TelField("Ingresa tu telefono", {
+        validators.DataRequired(message="El campo télefono es requerido")
+    })
+    tamanioPizza = RadioField("Tamaño Pizza", choices=[('chica', 'Chica $40'), ('mediana', 'Mediana $80'), ('grande', 'Grande $120')], validators=[validators.DataRequired()])
+    
+    jamon = BooleanField('Jamon $10')
+    pinia = BooleanField('Piña $10')
+    champiniones = BooleanField('Champiñones $10')
+    
+    numeroPizzas = IntegerField("Ingresa el núimero de pizzas", {
         validators.DataRequired(message="El campo télefono es requerido")
     })

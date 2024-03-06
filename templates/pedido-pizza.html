@@ -1,0 +1,275 @@
+{% extends 'layout2.html' %}
+{% from "_macros.html" import form_floating, radio, boolean %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col d-flex flex-column">
+            <h1 class="display-4">Pedido Pizza</h1>
+
+            <div>
+                <div class="row">
+                    <div class="col">{{ form_floating(form.nombreCliente) }}</div>
+                    <div class="col">{{ form_floating(form.direccionCliente) }}</div>
+                    <div class="col">{{ form_floating(form.telefonoCliente) }}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col">{{ radio(form.tamanioPizza) }}</div>
+                    <div class="col mt-3">
+                        Ingredientes
+
+                        <div class="d-block">
+                            {{ boolean(form.jamon) }}
+                        </div>
+                        <div class="d-block">
+                            {{ boolean(form.pinia) }}
+                        </div>
+                        <div class="d-block">
+                            {{ boolean(form.champiniones) }}
+                        </div>
+                    </div>
+                    <div class="col">{{ form_floating(form.numeroPizzas) }}</div>
+                    <div class="col">
+                        <button type="button" onclick="agregarPizza()" class="btn btn-success w-100">Agregar
+                            pizza</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="d-flex flex-column">
+                        <table class="table table-secondary">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>Tamaño</th>
+                                    <th>Ingredientes</th>
+                                    <th>Numero Pizzas</th>
+                                    <th>SubTotal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="tbodyPedido">
+                                <tr class="text-center">
+                                    <td colspan="5">Esperando pizzas...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div>
+                            <button class="btn btn-success w-100" onclick="finalizarPedido();">Finalizar pedido</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <h3 class="text-center">Ventas del día</h3>
+
+                    {% for venta in ventas %}
+                    <p class="d-block text-center">{{ venta.nombreCliente }} ${{ venta.total }}</p>
+                    {% endfor %}
+
+                    <a href="{{ url_for('ventas') }}" class="btn btn-primary w-100">Ver ventas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let pizzas = [];
+    let csrf_token = "{{csrf_token()}}";
+
+    function agregarPizza() {
+        let numeroPizzas = document.getElementById("numeroPizzas").value;
+        if (numeroPizzas == "") {
+            document.getElementById("errores-numeroPizzas").innerHTML = "Debes ingresar el número de pizzas"
+            return
+        } else {
+            document.getElementById("errores-numeroPizzas").innerHTML = ""
+        }
+
+        let chkJamon = document.getElementById("jamon").checked;
+        let chkPinia = document.getElementById("pinia").checked;
+        let chkChampiniones = document.getElementById("champiniones").checked;
+
+        let inputTamanioPizza = document.querySelector('input[name="tamanioPizza"]:checked');
+        let tamanioPizza;
+        if (inputTamanioPizza) {
+            tamanioPizza = inputTamanioPizza.value;
+            document.getElementById("errores-numeroPizzas").innerHTML = ""
+        } else {
+            tamanioPizza = "Valor por defecto o cualquier cosa que desees asignar";
+            document.getElementById("errores-numeroPizzas").innerHTML = "Debes seleccionar un tamaño de pizza"
+            return;
+        }
+
+        pizzas.push({
+            numeroPizzas,
+            tamanioPizza,
+            ingredientes: {
+                "jamon": chkJamon,
+                "pinia": chkPinia,
+                "champiniones": chkChampiniones
+            }
+        });
+
+        actualizarTablaPedido();
+    }
+
+    function eliminarPizza(index) {
+        // Utilizar splice para eliminar el elemento en el índice dado
+        pizzas.splice(index, 1);
+        console.log(`Pizza en el índice ${index} eliminada.`);
+        actualizarTablaPedido();
+    }
+
+    function actualizarTablaPedido() {
+        let tbodyPedido = document.getElementById("tbodyPedido");
+        let tbody = "";
+
+        if (pizzas.length != 0) {
+            pizzas.forEach((pizza, index) => {
+                let subtotal = 0;
+
+                switch (pizza.tamanioPizza) {
+                    case "chica":
+                        subtotal += 40;
+                        break;
+
+                    case "mediana":
+                        subtotal += 80;
+                        break;
+
+                    case "grande":
+                        subtotal += 120;
+                        break;
+                }
+
+                let ingredientes = "";
+
+                if (pizza.ingredientes.jamon == true) {
+                    subtotal += 10;
+                    ingredientes += "Jamon, "
+                }
+
+                if (pizza.ingredientes.pinia == true) {
+                    subtotal += 10;
+                    ingredientes += "Piña, "
+                }
+
+                if (pizza.ingredientes.champiniones == true) {
+                    subtotal += 10;
+                    ingredientes += "Champiñones"
+                }
+
+                subtotal *= pizza.numeroPizzas
+
+                tbody += `
+                <tr>
+                    <td>${pizza.tamanioPizza}</td>
+                    <td>${ingredientes}</td>
+                    <td>${pizza.numeroPizzas}</td>
+                    <td>$${subtotal}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="eliminarPizza(${index})">Eliminar</button>
+                    </td>
+                </tr>`;
+            });
+        } else {
+            tbody = `
+            <tr class="text-center">
+                <td colspan="5">Esperando pizzas...</td>
+            </tr>`;
+
+        }
+
+        tbodyPedido.innerHTML = tbody;
+    }
+
+    function finalizarPedido() {
+        let nombreCliente = document.getElementById("nombreCliente").value;
+        if (nombreCliente == "") {
+            document.getElementById("errores-nombreCliente").innerHTML = "Debes ingresar el nombre del cliente"
+            return
+        } else {
+            document.getElementById("errores-nombreCliente").innerHTML = ""
+        }
+
+        let direccionCliente = document.getElementById("direccionCliente").value;
+        if (direccionCliente == "") {
+            document.getElementById("errores-direccionCliente").innerHTML = "Debes ingresar la dirección del cliente"
+            return
+        } else {
+            document.getElementById("errores-direccionCliente").innerHTML = ""
+        }
+
+        let telefonoCliente = document.getElementById("telefonoCliente").value;
+        if (telefonoCliente == "") {
+            document.getElementById("errores-telefonoCliente").innerHTML = "Debes ingresar el telefono del cliente"
+            return
+        } else {
+            document.getElementById("errores-telefonoCliente").innerHTML = ""
+        }
+
+        let total = 0;
+
+        pizzas.forEach(pizza => {
+            let subtotal = 0;
+
+            switch (pizza.tamanioPizza) {
+                case "chica":
+                    subtotal += 40;
+                    break;
+
+                case "mediana":
+                    subtotal += 80;
+                    break;
+
+                case "grande":
+                    subtotal += 120;
+                    break;
+            }
+
+            if (pizza.ingredientes.jamon == true) {
+                subtotal += 10;
+            }
+
+            if (pizza.ingredientes.pinia == true) {
+                subtotal += 10;
+            }
+
+            if (pizza.ingredientes.champiniones == true) {
+                subtotal += 10;
+            }
+
+            total += subtotal * pizza.numeroPizzas;
+        });
+
+        let venta = {
+            nombreCliente,
+            total
+        }
+
+        fetch('/pedido-pizza', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf_token,
+            },
+            body: JSON.stringify(venta),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Respuesta del servidor:', data);
+
+                location.reload()
+            })
+            .catch(error => {
+                console.error('Error al enviar la solicitud:', error);
+            });
+    }
+</script>
+{% endblock %}

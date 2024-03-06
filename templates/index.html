@@ -11,10 +11,18 @@
             {{ form_floating(formRegistro.primerApellido) }}
             {{ form_floating(formRegistro.email, "email") }}
 
-            <button type="submit" class="btn btn-success w-100">Registrar</button>
+            <button type="button" onClick="agregarPizza()" class="btn btn-success w-100">Registrar</button>
 
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         </form>
     </div>
 </div>
+
+<script>
+    function agregarPizza(){
+        let nombreCliente = document.getElementById("nombreCliente").value;
+        let direccionCliente = document.getElementById("nombreCliente").value;
+        let telefonoCliente = document.getElementById("nombreCliente").value;
+    }
+</script>
 {% endblock %}

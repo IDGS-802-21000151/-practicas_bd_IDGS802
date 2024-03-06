@@ -18,11 +18,10 @@
 {% endif %}
 {% endmacro %}
 
-{% macro form_floating(field, type = "text", value = "") %}
-<div class="form-floating mb-3">
-    {{ field(class = "form-control", type=type, value=value)|safe }}
-    {{ field.label }}
-</div>
+{% macro boolean(field) %}
+<label class="form-label">{{ field.label }}</label>
+
+{{ field(class = "")|safe }}
 
 {% if field.errors %}
 <ul>
@@ -33,6 +32,16 @@
     {% endfor %}
 </ul>
 {% endif %}
+{% endmacro %}
+
+{% macro form_floating(field, type = "text", value = "") %}
+<div class="form-floating mb-3">
+    {{ field(class = "form-control", type=type, value=value)|safe }}
+    {{ field.label }}
+</div>
+
+<p class="bg-danger text-white" id="errores-{{field.name}}">
+</p>
 {% endmacro %}
 
 {% macro radio(field) %}
