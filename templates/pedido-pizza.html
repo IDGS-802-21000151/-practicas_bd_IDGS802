@@ -1,5 +1,5 @@
 {% extends 'layout2.html' %}
-{% from "_macros.html" import form_floating, radio, boolean %}
+{% from "_macros.html" import form_floating, radio, boolean, date %}
 
 {% block content %}
 <div class="container-fluid">
@@ -18,7 +18,6 @@
                     <div class="col">{{ radio(form.tamanioPizza) }}</div>
                     <div class="col mt-3">
                         Ingredientes
-
                         <div class="d-block">
                             {{ boolean(form.jamon) }}
                         </div>
@@ -29,7 +28,15 @@
                             {{ boolean(form.champiniones) }}
                         </div>
                     </div>
-                    <div class="col">{{ form_floating(form.numeroPizzas) }}</div>
+                    <div class="col">
+                        <div class="d-block">
+                            {{ form_floating(form.numeroPizzas) }}
+                        </div>
+
+                        <div class="d-block">
+                            {{ date(form.fechaPedido) }}
+                        </div>
+                    </div>
                     <div class="col">
                         <button type="button" onclick="agregarPizza()" class="btn btn-success w-100">Agregar
                             pizza</button>
@@ -67,9 +74,13 @@
                 <div class="col">
                     <h3 class="text-center">Ventas del día</h3>
 
+                    {% if ventas %}
                     {% for venta in ventas %}
-                    <p class="d-block text-center">{{ venta.nombreCliente }} ${{ venta.total }}</p>
+                    <p class="d-block text-center">{{ venta.nombre_cliente }} ${{ venta.total }}</p>
                     {% endfor %}
+                    {% else %}
+                    <p class="d-block text-center">No hay ventas disponibles.</p>
+                    {% endif %}
 
                     <a href="{{ url_for('ventas') }}" class="btn btn-primary w-100">Ver ventas</a>
                 </div>
@@ -214,7 +225,18 @@
             document.getElementById("errores-telefonoCliente").innerHTML = ""
         }
 
+        let fechaPedido = document.getElementById("fechaPedido").value;
+        if (fechaPedido == "") {
+            document.getElementById("errores-fechaPedido").innerHTML = "Debes ingresar la fecha del pedido"
+            return
+        } else {
+            document.getElementById("errores-fechaPedido").innerHTML = ""
+        }
+
         let total = 0;
+
+        console.log(direccionCliente)
+        console.log(telefonoCliente)
 
         pizzas.forEach(pizza => {
             let subtotal = 0;
@@ -250,8 +272,13 @@
 
         let venta = {
             nombreCliente,
-            total
+            direccionCliente,
+            telefonoCliente,
+            total,
+            fechaPedido
         }
+
+        console.log(venta)
 
         fetch('/pedido-pizza', {
             method: 'POST',

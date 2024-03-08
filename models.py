@@ -21,6 +21,9 @@ class Maestros(db.Model):
     
 class Ventas(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    nombreCliente = db.Column(db.String(50))
+    nombre_cliente = db.Column(db.String(50))
+    direccion_cliente = db.Column(db.String(50))
+    telefono_cliente = db.Column(db.String(50))
     total = db.Column(db.Integer)
-    create_date = db.Column(db.DateTime, default=datetime.datetime.now)
+    fecha_pedido = db.Column(db.DateTime, default=datetime.datetime.now)
+    dia_semana = db.Column(db.String(20), default=datetime.datetime.now().strftime('%a'))

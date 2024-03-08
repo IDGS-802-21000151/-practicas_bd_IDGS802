@@ -11,13 +11,28 @@
                 <label for="month" class="form-label">Ventas por mes:</label>
                 <input type="month" class="form-control" id="month" name="month"
                     value="{% if month %}{{ month }}{% endif %}">
-                <button class="btn btn-success w-100">Buscar</button>
+                <button type="submit" class="btn btn-success w-100">Buscar</button>
             </form>
 
             <form class="col" action="/ventas" method="GET">
                 <label for="day" class="form-label">Ventas por día:</label>
                 <input type="date" class="form-control" id="day" name="day" value="{% if day %}{{ day }}{% endif %}">
-                <button class="btn btn-success w-100">Buscar</button>
+                <button type="submit" class="btn btn-success w-100">Buscar</button>
+            </form>
+
+            <form action="/ventas" method="GET" class="col">
+                <label for="weekday" class="form-label">Selecciona un día de la semana:</label>
+                <select id="weekday" name="weekday" class="form-control">
+                    <option {% if not weekday %} selected {% endif %} disabled>Selecciona</option>
+                    <option value="Mon" {% if weekday=="Mon" %} selected {% endif %}>Lunes</option>
+                    <option value="Tue" {% if weekday=="Tue" %} selected {% endif %}>Martes</option>
+                    <option value="Wed" {% if weekday=="Wed" %} selected {% endif %}>Miércoles</option>
+                    <option value="Thu" {% if weekday=="Thu" %} selected {% endif %}>Jueves</option>
+                    <option value="Fri" {% if weekday=="Fri" %} selected {% endif %}>Viernes</option>
+                    <option value="Sat" {% if weekday=="Sat" %} selected {% endif %}>Sabado</option>
+                    <option value="Sun" {% if weekday=="Sun" %} selected {% endif %}>Domingo</option>
+                </select>
+                <button type="submit" class="btn btn-success w-100">Buscar</button>
             </form>
         </div>
 
@@ -27,8 +42,11 @@
             <thead>
                 <tr class="text-center">
                     <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Telefono</th>
                     <th>Total</th>
-                    <th>Fecha</th>
+                    <th>Fecha Pedido</th>
+                    <th>Día Semana</th>
                 </tr>
             </thead>
 
@@ -36,14 +54,33 @@
                 {% if ventas %}
                 {% for venta in ventas %}
                 <tr class="text-center">
-                    <td>{{ venta.nombreCliente }}</td>
+                    <td>{{ venta.nombre_cliente }}</td>
+                    <td>{{ venta.direccion_cliente }}</td>
+                    <td>{{ venta.telefono_cliente }}</td>
                     <td>{{ venta.total }}</td>
-                    <td>{{ venta.create_date }}</td>
+                    <td>{{ venta.fecha_pedido }}</td>
+                    <td>
+                        {% if venta.dia_semana == "Mon" %}
+                        Lunes
+                        {% elif venta.dia_semana == "Tue" %}
+                        Martes
+                        {% elif venta.dia_semana == "Wed" %}
+                        Miercoles
+                        {% elif venta.dia_semana == "Thu" %}
+                        Jueves
+                        {% elif venta.dia_semana == "Fri" %}
+                        Viernes
+                        {% elif venta.dia_semana == "Sat" %}
+                        Sabado
+                        {% elif venta.dia_semana == "Sun" %}
+                        Domingo
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
                 {% else %}
                 <tr>
-                    <td colspan="3" class="text-center">No hay ventas disponibles.</td>
+                    <td colspan="6" class="text-center">No hay ventas disponibles.</td>
                 </tr>
                 {% endif %}
             </tbody>

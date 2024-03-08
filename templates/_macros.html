@@ -44,6 +44,17 @@
 </p>
 {% endmacro %}
 
+<label for="startDate">Start</label>
+<input id="startDate" class="form-control" type="date" />
+
+{% macro date(field, value = "") %}
+{{ field.label(class = "form-label") }}
+{{ field(class = "form-control", type="date", value=value)|safe }}
+
+<p class="bg-danger text-white" id="errores-{{field.name}}">
+</p>
+{% endmacro %}
+
 {% macro radio(field) %}
 <div class="form-group mt-3">
     {{ field.label }}

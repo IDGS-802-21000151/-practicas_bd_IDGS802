@@ -1,5 +1,5 @@
 from wtforms import Form
-from wtforms import StringField, TextAreaField, SelectField, RadioField, IntegerField, TelField, BooleanField
+from wtforms import StringField, TextAreaField, SelectField, RadioField, IntegerField, TelField, BooleanField, DateField
 from wtforms import EmailField
 from wtforms import validators
 
@@ -50,6 +50,7 @@ class PizzasForm(Form):
     pinia = BooleanField('Piña $10')
     champiniones = BooleanField('Champiñones $10')
     
-    numeroPizzas = IntegerField("Ingresa el núimero de pizzas", {
-        validators.DataRequired(message="El campo télefono es requerido")
+    numeroPizzas = IntegerField("Ingresa el número de pizzas", {
+        validators.DataRequired(message="El campo número de pizzas es requerido")
     })
+    fechaPedido = DateField("Ingresa la fecha del pedido")

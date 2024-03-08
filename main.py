@@ -76,16 +76,35 @@ def eliminarAlumno():
 @app.route("/pedido-pizza", methods=["GET", "POST"])
 def pedidoPizza():
     formPedido = forms.PizzasForm(request.form)
-    ventas = Ventas.query.all()
+    
+    today = date.today()
+
+    fechaInicio = datetime.combine(today, datetime.min.time())
+    fechaFinal = datetime.combine(today, datetime.max.time())
+
+    ventas = Ventas.query.filter(Ventas.fecha_pedido.between(fechaInicio, fechaFinal)).all()
     
     if request.method == "POST":
         ventaJSON = request.json
         
-        venta = Ventas(
-            nombreCliente = ventaJSON.get("nombreCliente"),
-            total = ventaJSON.get("total"),
-        )
+        fechaPedido = datetime.strptime(ventaJSON.get("fechaPedido"), "%Y-%m-%d")
         
+        print(ventaJSON.get("fechaPedido"))
+        fechaActual = datetime.now()
+
+        fechaCombinada = fechaPedido.replace(hour=fechaActual.hour, minute=fechaActual.minute, second=fechaActual.second)
+        
+        diaSemana = fechaCombinada.strftime('%a')
+        
+        venta = Ventas(
+            nombre_cliente = ventaJSON.get("nombreCliente"),
+            direccion_cliente = ventaJSON.get("direccionCliente"),
+            telefono_cliente = ventaJSON.get("telefonoCliente"),
+            total = ventaJSON.get("total"),
+            fecha_pedido = fechaCombinada,
+            dia_semana = diaSemana
+        )
+            
         db.session.add(venta)
         db.session.commit()
         
@@ -97,6 +116,7 @@ def pedidoPizza():
 def ventas():
     month = request.args.get('month')
     day = request.args.get('day')
+    weekday = request.args.get('weekday')
     
     if month != None:
         diaFiltro = datetime.strptime(month, '%Y-%m').date()
@@ -106,7 +126,7 @@ def ventas():
         fechaInicio = datetime.combine(diaFiltro, datetime.min.time())
         fechaFinal = datetime.combine(primerDiaSiguienteMes, datetime.min.time())
 
-        ventas = Ventas.query.filter(Ventas.create_date.between(fechaInicio, fechaFinal)).all()
+        ventas = Ventas.query.filter(Ventas.fecha_pedido.between(fechaInicio, fechaFinal)).all()
         totalVentas = sum(venta.total for venta in ventas)
         
         return render_template("ventas.html", ventas = ventas, month = month, totalVentas = totalVentas)
@@ -116,10 +136,15 @@ def ventas():
         fechaInicio = datetime.combine(diaFiltro, datetime.min.time())
         fechaFinal = datetime.combine(diaFiltro, datetime.max.time())
 
-        ventas = Ventas.query.filter(Ventas.create_date.between(fechaInicio, fechaFinal)).all()
+        ventas = Ventas.query.filter(Ventas.fecha_pedido.between(fechaInicio, fechaFinal)).all()
         totalVentas = sum(venta.total for venta in ventas)
         
         return render_template("ventas.html", ventas = ventas, day = day, totalVentas = totalVentas)
+    elif weekday != None:
+        ventas = Ventas.query.filter(Ventas.dia_semana == weekday).all()
+        totalVentas = sum(venta.total for venta in ventas)
+        
+        return render_template("ventas.html", ventas = ventas, weekday = weekday, totalVentas = totalVentas)
     else:
         ventas = Ventas.query.all()
         totalVentas = sum(venta.total for venta in ventas)
